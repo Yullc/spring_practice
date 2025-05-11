@@ -21,6 +21,7 @@
     </delete>
 
     <update id="modifyArticle" parameterType="map">
+
         UPDATE article
         <set>
             <if test="title != null and title != ''">title = #{title},</if>

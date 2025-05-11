@@ -5,28 +5,37 @@
 <%@ include file="../common/head.jspf"%>
 
 
-<table border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse;">
-	<thead>
+<table class="w-full border border-gray-300">
+	<thead class="bg-gray-100">
 		<tr>
-			<th style="text-align: center;">ID</th>
-			<th style="text-align: center;">Registration Date</th>
-			<th style="text-align: center;">Title</th>
-			<th style="text-align: center;">Member ID</th>
+			<th class="text-center border px-4 py-2">ID</th>
+			<th class="text-center border px-4 py-2">Registration Date</th>
+			<th class="text-center border px-4 py-2">Title</th>
+			<th class="text-center border px-4 py-2">Member ID</th>
+			<th class="text-center border px-4 py-2">삭제</th>
 		</tr>
 	</thead>
 	<tbody>
-		<c:forEach var="article" items="${articles }">
-			<tr>
-				<td style="text-align: center;">${article.id}</td>
-				<td style="text-align: center;">${article.regDate.substring(0,10)}</td>
-				<td style="text-align: center;">
-					<a href="detail?id=${article.id }">${article.title }</a>
+		<c:forEach var="article" items="${articles}">
+			<tr class="hover:bg-gray-50">
+				<td class="text-center border px-4 py-2">${article.id}</td>
+				<td class="text-center border px-4 py-2">${article.regDate.substring(0,10)}</td>
+				<td class="text-center border px-4 py-2">
+					<a href="detail?id=${article.id}" class="text-blue-600 hover:underline">${article.title}</a>
 				</td>
-				<td style="text-align: center;">${article.memberId }</td>
+				<td class="text-center border px-4 py-2">${article.memberId}</td>
+				<td class="text-center border px-4 py-2">
+    <button onclick="doDeleteArticle(${article.id})"
+            class="text-red-600 hover:underline">
+        삭제
+    </button>
+</td>
+
 			</tr>
 		</c:forEach>
 	</tbody>
 </table>
+
 
 
 
