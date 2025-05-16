@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UsrHomeController {
     @RequestMapping("/usr/home/main")
     public String showMain() {
-        System.out.println("aaa");
         return "/usr/home/main";
     }
 
