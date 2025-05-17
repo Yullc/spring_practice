@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.example.demo.service.ReactionPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import com.example.demo.vo.Article;
 import com.example.demo.vo.Board;
 import com.example.demo.vo.ResultData;
 import com.example.demo.vo.Rq;
+import com.example.demo.vo.ReactionPoint;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,9 @@ public class UsrArticleController {
 
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private ReactionPointService reactionPointService;
 
     UsrArticleController(BeforeActionInterceptor beforeActionInterceptor) {
         this.beforeActionInterceptor = beforeActionInterceptor;
@@ -108,16 +113,15 @@ public class UsrArticleController {
     }
 
     @RequestMapping("/usr/article/detail")
-    public String showDetail(HttpServletRequest req, Model model, int id) {
-
+    public String showDetail(HttpServletRequest req, Model model, @RequestParam int id) {
         Rq rq = (Rq) req.getAttribute("rq");
 
         Article article = articleService.getForPrintArticle(rq.getLoginedMemberId(), id);
-
         model.addAttribute("article", article);
 
         return "usr/article/detail";
     }
+
 
     @RequestMapping("/usr/article/doIncreaseHitCountRd")
     @ResponseBody
@@ -132,7 +136,31 @@ public class UsrArticleController {
         return ResultData.newData(increaseHitCountRd, "hitCount", articleService.getArticleHitCount(id));
     }
 
+    @RequestMapping("/usr/article/doIncreaseLikeCountRd")
+    @ResponseBody
+    public ResultData doIncreaseLikeCount(HttpServletRequest req,int id) {
+        Rq rq = (Rq) req.getAttribute("rq");
+        ResultData increaseLikeCountRd = reactionPointService.doIncreaseLikeCount(id);
 
+        if (increaseLikeCountRd.isFail()) {
+            return increaseLikeCountRd;
+        }
+
+        return ResultData.newData(increaseLikeCountRd, "likeCount", reactionPointService.doIncreaseLikeCount(id));
+    }
+
+    @RequestMapping("/usr/article/doInecreaseDisLikeCountRd")
+    @ResponseBody
+    public ResultData doIncreaseDisLikeCount(HttpServletRequest req,int id) {
+        Rq rq = (Rq) req.getAttribute("rq");
+        ResultData increaseDisLikeCountRd = reactionPointService.doIncreaseDisLikeCount(id);
+
+        if (increaseDisLikeCountRd.isFail()) {
+            return increaseDisLikeCountRd;
+        }
+
+        return ResultData.newData(increaseDisLikeCountRd, "likeCount", reactionPointService.doIncreaseDisLikeCount(id));
+    }
 
     @RequestMapping("/usr/article/write")
     public String showWrite(HttpServletRequest req) {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.ReactionPointRepository">
+    <select id="getLikePoint" resultType="int" parameterType="map">
+        SELECT IFNULL(SUM(likePoint), 0)
+        FROM reactionPoint
+        WHERE relTypeCode = #{relTypeCode}
+          AND relId = #{relId}
+          AND likePoint > 0
+    </select>
+
+    <select id="getDisLikePoint" resultType="int" parameterType="map">
+        SELECT IFNULL(SUM(dislikePoint), 0)
+        FROM reactionPoint
+        WHERE relTypeCode = #{relTypeCode}
+          AND relId = #{relId}
+          AND dislikePoint > 0
+    </select>
+
+    <update id="increaseLikeCount" parameterType="int">
+        UPDATE reactionPoint
+        SET
+            likePoint = likePoint + 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="increaseDisLikeCount" parameterType="int">
+        UPDATE reactionPoint
+        SET
+            dislikePoint = dislikePoint + 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -1,3 +1,4 @@
+<%--@elvariable id="reactionPoint" type="com.example.demo.repository.ReactionPointRepository"--%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
@@ -56,16 +57,16 @@
 					<td style="text-align: center;">${article.boardId }</td>
 				</tr>
 				<tr>
-					<th style="text-align: center;">LIKE</th>
-					<td style="text-align: center;">${article.extra__goodReactionPoint }</td>
+				  <th style="text-align: center;">LIKE</th>
+				  <td style="text-align: center;">${article.extra__goodReactionPoint}</td>
 				</tr>
 				<tr>
-					<th style="text-align: center;">DISLIKE</th>
-					<td style="text-align: center;">${article.extra__badReactionPoint }</td>
+				  <th style="text-align: center;">DISLIKE</th>
+				  <td style="text-align: center;">${article.extra__badReactionPoint}</td>
 				</tr>
 				<tr>
-					<th style="text-align: center;">SUM</th>
-					<td style="text-align: center;">${article.extra__sumReactionPoint }</td>
+				  <th style="text-align: center;">SUM</th>
+				  <td style="text-align: center;">${article.extra__sumReactionPoint}</td>
 				</tr>
 				<tr>
 					<th style="text-align: center;">VIEWS</th>
@@ -91,6 +92,8 @@
 			<c:if test="${article.userCanDelete }">
 				<a class="btn btn-ghost" href="../article/doDelete?id=${article.id}">삭제</a>
 			</c:if>
+			<a class="btn btn-ghost" href="../article/doIncreaseLikeCountRd?id=${article.id}">좋아요</a>
+			<a class="btn btn-ghost" href="../article/doIncreaseDisLikeCountRd?id=${article.id}">싫어요</a>
 		</div>
 
 	</div>
