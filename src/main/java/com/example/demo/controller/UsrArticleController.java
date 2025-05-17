@@ -149,7 +149,7 @@ public class UsrArticleController {
         return ResultData.newData(increaseLikeCountRd, "likeCount", reactionPointService.doIncreaseLikeCount(id));
     }
 
-    @RequestMapping("/usr/article/doInecreaseDisLikeCountRd")
+    @RequestMapping("/usr/article/doIncreaseDisLikeCountRd")
     @ResponseBody
     public ResultData doIncreaseDisLikeCount(HttpServletRequest req,int id) {
         Rq rq = (Rq) req.getAttribute("rq");

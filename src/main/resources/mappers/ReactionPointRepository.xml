@@ -5,7 +5,7 @@
 
 <mapper namespace="com.example.demo.repository.ReactionPointRepository">
     <select id="getLikePoint" resultType="int" parameterType="map">
-        SELECT IFNULL(SUM(likePoint), 0)
+        SELECT IFNULL(SUM(likePoint), 0) AS likePoint
         FROM reactionPoint
         WHERE relTypeCode = #{relTypeCode}
           AND relId = #{relId}
@@ -13,7 +13,7 @@
     </select>
 
     <select id="getDisLikePoint" resultType="int" parameterType="map">
-        SELECT IFNULL(SUM(dislikePoint), 0)
+        SELECT IFNULL(SUM(dislikePoint), 0) AS dislikePoint
         FROM reactionPoint
         WHERE relTypeCode = #{relTypeCode}
           AND relId = #{relId}
