@@ -17,8 +17,8 @@ public class ReactionPointService {
     public int getDisLikePoint(String relTypeCode, int relId) {
         return reactionPointRepository.getDisLikePoint(relTypeCode, relId);
     }
-    public ResultData doIncreaseLikeCount(int id,int loginedMemberId) {
-        this.loginedMemberId = loginedMemberId;
+    public ResultData doIncreaseLikeCount(int id) {
+
         int likeCount = reactionPointRepository.increaseLikeCount(id);
 
         if (likeCount == 0) {
@@ -28,7 +28,7 @@ public class ReactionPointService {
         return ResultData.from("S-1", "좋아요 증가", "id", id);
     }
 
-    public ResultData doIncreaseDisLikeCount(int id, int i) {
+    public ResultData doIncreaseDisLikeCount(int id) {
         int dislikeCount = reactionPointRepository.increaseDisLikeCount(id);
 
         if (dislikeCount == 0) {
@@ -37,6 +37,7 @@ public class ReactionPointService {
 
         return ResultData.from("S-1", "싫어요 증가", "id", id);
     }
+
 
 
 }

@@ -3,7 +3,9 @@ package com.example.demo.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.example.demo.service.CommentService;
 import com.example.demo.service.ReactionPointService;
+import com.example.demo.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +16,6 @@ import com.example.demo.interceptor.BeforeActionInterceptor;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.BoardService;
 import com.example.demo.util.Ut;
-import com.example.demo.vo.Article;
-import com.example.demo.vo.Board;
-import com.example.demo.vo.ResultData;
-import com.example.demo.vo.Rq;
-import com.example.demo.vo.ReactionPoint;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,6 +32,9 @@ public class UsrArticleController {
 
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     private ReactionPointService reactionPointService;
@@ -235,7 +235,7 @@ public class UsrArticleController {
 
     @RequestMapping("/usr/article/doComment")
     @ResponseBody
-    public String doComment(HttpServletRequest req, String commentBody, String articleId) {
+    public String doComment(HttpServletRequest req, String commentBody, int articleId) {
 
         Rq rq = (Rq) req.getAttribute("rq");
 
@@ -243,7 +243,7 @@ public class UsrArticleController {
             return Ut.jsHistoryBack("F-1", "내용 입력하세요");
         }
 
-        ResultData doCommentRd = articleService.writeArticle(rq.getLoginedMemberId(), commentBody, artilceId);
+        ResultData doCommentRd = commentService.writeComment(rq.getLoginedMemberId(), commentBody, articleId);
 
         int id = (int) doCommentRd.getData1();
 
