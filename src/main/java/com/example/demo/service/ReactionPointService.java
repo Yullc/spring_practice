@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 public class ReactionPointService {
     @Autowired
     private ReactionPointRepository reactionPointRepository;
+    private int loginedMemberId;
 
     public int getLikePoint(String relTypeCode, int relId) {
         return reactionPointRepository.getLikePoint(relTypeCode, relId);
@@ -16,7 +17,8 @@ public class ReactionPointService {
     public int getDisLikePoint(String relTypeCode, int relId) {
         return reactionPointRepository.getDisLikePoint(relTypeCode, relId);
     }
-    public ResultData doIncreaseLikeCount(int id) {
+    public ResultData doIncreaseLikeCount(int id,int loginedMemberId) {
+        this.loginedMemberId = loginedMemberId;
         int likeCount = reactionPointRepository.increaseLikeCount(id);
 
         if (likeCount == 0) {
@@ -26,7 +28,7 @@ public class ReactionPointService {
         return ResultData.from("S-1", "좋아요 증가", "id", id);
     }
 
-    public ResultData doIncreaseDisLikeCount(int id) {
+    public ResultData doIncreaseDisLikeCount(int id, int i) {
         int dislikeCount = reactionPointRepository.increaseDisLikeCount(id);
 
         if (dislikeCount == 0) {

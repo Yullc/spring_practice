@@ -232,4 +232,23 @@ public class UsrArticleController {
 
         return "usr/article/list";
     }
+
+    @RequestMapping("/usr/article/doComment")
+    @ResponseBody
+    public String doComment(HttpServletRequest req, String commentBody, String articleId) {
+
+        Rq rq = (Rq) req.getAttribute("rq");
+
+        if (Ut.isEmptyOrNull(commentBody)) {
+            return Ut.jsHistoryBack("F-1", "내용 입력하세요");
+        }
+
+        ResultData doCommentRd = articleService.writeArticle(rq.getLoginedMemberId(), commentBody, artilceId);
+
+        int id = (int) doCommentRd.getData1();
+
+        Comment comment = commentService.getCommentById(id);
+
+        return Ut.jsReplace(doCommentRd.getResultCode(), doCommentRd.getMsg(), "../article/detail?id=" + id);
+    }
 }

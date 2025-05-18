@@ -11,6 +11,17 @@ CREATE TABLE article (
                          `body` TEXT NOT NULL
 );
 
+CREATE TABLE comment (
+                         id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                         articleId INT(10) UNSIGNED NOT NULL,
+                         memberId INT(10) UNSIGNED NOT NULL,
+                         regDate DATETIME NOT NULL,
+                         updateDate DATETIME NOT NULL,
+                         commentBody TEXT NOT NULL
+
+);
+
+SET GLOBAL sql_mode = (SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
 # 회원 테이블 생성
 CREATE TABLE `member` (
                           id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -150,10 +161,31 @@ UPDATE article
 SET boardId = 3
 WHERE id = 5;
 
-ALTER TABLE article ADD COLUMN hitCount INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `body`;
+SELECT IFNULL(SUM(dislikePoint), 0) as dislikePoint
+FROM reactionPoint
+WHERE relTypeCode = 'article'
+  AND relId = 1
+  AND dislikePoint > 0;
 
+SELECT
+    A.*,
+    M.nickname AS extra__writer,
+    IFNULL(SUM(RP.likePoint), 0) AS extra__likePoint,
+    IFNULL(SUM(RP.dislikePoint), 0) AS extra__dislikePoint,
+    IFNULL(SUM(RP.likePoint - RP.dislikePoint), 0) AS extra__sumReactionPoint
+FROM article AS A
+         INNER JOIN member AS M ON A.memberId = M.id
+         LEFT JOIN reactionPoint AS RP
+                   ON RP.relTypeCode = 'article' AND RP.relId = A.id
+WHERE A.id = 1
+GROUP BY A.id;
+
+ALTER TABLE reactionPoint ADD COLUMN point INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER dislikePoint;
+
+select * from article;
+select * from reactionPoint;
 # reactionPoint 테이블 생성
-
+drop table reactionPoint;
 CREATE TABLE reactionPoint (
                                id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
                                regDate DATETIME NOT NULL,
@@ -161,7 +193,8 @@ CREATE TABLE reactionPoint (
                                memberId INT(10) UNSIGNED NOT NULL,
                                relTypeCode CHAR(50) NOT NULL COMMENT '관련 데이터 타입 코드',
                                relId INT(10) NOT NULL COMMENT '관련 데이터 번호',
-                               `point` INT(10) NOT NULL
+                               likePoint INT(10) NOT NULL,
+                               dislikePoint INT(10) NOT NULL
 );
 
 # reactionPoint 테스트 데이터 생성
@@ -172,7 +205,8 @@ updateDate = NOW(),
 memberId = 1,
 relTypeCode = 'article',
 relId = 1,
-`point` = -1;
+likePoint = 0,
+dislikePoint = 1;
 
 # 1번 회원이 2번 글에 좋아요
 INSERT INTO reactionPoint
@@ -181,7 +215,8 @@ updateDate = NOW(),
 memberId = 1,
 relTypeCode = 'article',
 relId = 2,
-`point` = 1;
+likePoint = 1,
+dislikePoint = 0;
 
 # 2번 회원이 1번 글에 싫어요
 INSERT INTO reactionPoint
@@ -190,7 +225,8 @@ updateDate = NOW(),
 memberId = 2,
 relTypeCode = 'article',
 relId = 1,
-`point` = -1;
+likePoint = 0,
+dislikePoint = 1;
 
 # 2번 회원이 2번 글에 싫어요
 INSERT INTO reactionPoint
@@ -199,7 +235,8 @@ updateDate = NOW(),
 memberId = 2,
 relTypeCode = 'article',
 relId = 2,
-`point` = -1;
+likePoint = 0,
+dislikePoint = 1;
 
 # 3번 회원이 1번 글에 좋아요
 INSERT INTO reactionPoint
@@ -208,24 +245,27 @@ updateDate = NOW(),
 memberId = 3,
 relTypeCode = 'article',
 relId = 1,
-`point` = 1;
+likePoint = 1,
+dislikePoint = 1;
 
 # article 테이블에 reactionPoint(좋아요) 컬럼 추가
 ALTER TABLE article ADD COLUMN goodReactionPoint INT(10) UNSIGNED NOT NULL DEFAULT 0;
 ALTER TABLE article ADD COLUMN badReactionPoint INT(10) UNSIGNED NOT NULL DEFAULT 0;
-
+select * from article;
 # update join -> 기존에 게시글의 good bad RP 값을 RP 테이블에서 추출해서 article 테이블에 채우기
 UPDATE article AS A
     INNER JOIN (
     SELECT RP.relTypeCode, RP.relId,
-    SUM(IF(RP.point > 0, RP.point, 0)) AS goodReactionPoint,
-    SUM(IF(RP.point < 0, RP.point * -1, 0)) AS badReactionPoint
+    SUM(RP.likePoint) AS goodReactionPoint,
+    SUM(RP.dislikePoint) AS badReactionPoint
     FROM reactionPoint AS RP
+    WHERE RP.relTypeCode = 'article'
     GROUP BY RP.relTypeCode, RP.relId
     ) AS RP_SUM
 ON A.id = RP_SUM.relId
     SET A.goodReactionPoint = RP_SUM.goodReactionPoint,
         A.badReactionPoint = RP_SUM.badReactionPoint;
+
 
 ######################################################################
 
