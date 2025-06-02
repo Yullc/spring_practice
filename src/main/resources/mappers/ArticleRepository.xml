@@ -40,8 +40,35 @@
         WHERE id = #{id}
     </update>
 
+    <update id="increaseGoodReactionPoint" parameterType="int">
+        UPDATE
+            article
+        SET
+            goodReactionPoint = goodReactionPoint + 1
+        WHERE id = #{relId}
+    </update>
 
+    <update id="decreaseGoodReactionPoint" parameterType="int">
+        UPDATE
+            article
+        SET goodReactionPoint = goodReactionPoint - 1
+        WHERE id =
+              #{relId}
+    </update>
 
+    <update id="increaseBadReactionPoint" parameterType="int">
+        UPDATE
+            article
+        SET badReactionPoint = badReactionPoint + 1
+        WHERE id = #{relId}
+    </update>
+
+    <update id="decreaseBadReactionPoint" parameterType="int">
+        UPDATE
+            article
+        SET badReactionPoint = badReactionPoint - 1
+        WHERE id = #{relId}
+    </update>
 
     <select id="getArticleHitCount" parameterType="int">
         SELECT hitCount
@@ -86,21 +113,14 @@
     </select>
 
 
-    <select id="getForPrintArticle" parameterType="int">
-        SELECT
-            A.*,
-            M.nickname AS extra__writer,
-            IFNULL(SUM(RP.likePoint), 0) AS extra__goodReactionPoint,
-            IFNULL(SUM(RP.dislikePoint), 0) AS extra__badReactionPoint,
-            IFNULL(SUM(RP.likePoint - RP.dislikePoint), 0) AS extra__sumReactionPoint
+    <select id="getForPrintArticle" parameterType="int"
+            resultType="com.example.demo.vo.Article">
+        SELECT A.*, M.nickname AS extra__writer
         FROM article AS A
-                 INNER JOIN member AS M ON A.memberId = M.id
-                 LEFT JOIN reactionPoint AS RP
-                           ON RP.relTypeCode = 'article' AND RP.relId = A.id
+                 INNER JOIN `member` AS M
+                            ON A.memberId = M.id
         WHERE A.id = #{id}
-        GROUP BY A.id
     </select>
-
 
     <select id="getArticleById" parameterType="int"
             resultType="com.example.demo.vo.Article">
@@ -111,15 +131,15 @@
 
     <select id="getForPrintArticles"
             resultType="com.example.demo.vo.Article">
-        SELECT A.*, M.nickname AS extra__writer,
-        IFNULL(SUM(RP.likePoint), 0) AS extra__goodReactionPoint,
-        IFNULL(SUM(RP.dislikePoint), 0) AS extra__badReactionPoint,
-        IFNULL(SUM(RP.likePoint - RP.dislikePoint), 0) AS extra__sumReactionPoint
+        SELECT A.*, M.nickname AS extra__writer, IFNULL(COUNT(R.id),0) AS
+        extra__repliesCount
         FROM article AS A
-        INNER JOIN `member` AS M
-        ON A.memberId = M.id
-        LEFT JOIN reactionPoint AS RP
-        ON A.id = RP.relId AND RP.relTypeCode = 'article'
+        INNER JOIN
+        `member` AS M
+        ON
+        A.memberId = M.id
+        LEFT JOIN `reply` AS R
+        ON A.id = R.relId
         WHERE 1
         <if test="boardId != 0">
             AND boardId = #{boardId}
@@ -159,6 +179,17 @@
                             ON A.memberId = M.id
         ORDER BY A.id
                 DESC
+    </select>
+
+    <select id="getGoodRP">SELECT goodReactionPoint
+                           FROM article
+                           WHERE id =
+                                 #{relId}
+    </select>
+    <select id="getBadRP">SELECT badReactionPoint
+                          FROM article
+                          WHERE id =
+                                #{relId}
     </select>
 
 </mapper>

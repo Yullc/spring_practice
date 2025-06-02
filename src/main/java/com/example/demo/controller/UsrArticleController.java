@@ -3,19 +3,24 @@ package com.example.demo.controller;
 import java.io.IOException;
 import java.util.List;
 
-import com.example.demo.service.CommentService;
-import com.example.demo.service.ReactionPointService;
-import com.example.demo.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.example.demo.interceptor.BeforeActionInterceptor;
 import com.example.demo.service.ArticleService;
 import com.example.demo.service.BoardService;
+import com.example.demo.service.ReactionPointService;
+import com.example.demo.service.ReplyService;
 import com.example.demo.util.Ut;
+import com.example.demo.vo.Article;
+import com.example.demo.vo.Board;
+import com.example.demo.vo.Reply;
+import com.example.demo.vo.ResultData;
+import com.example.demo.vo.Rq;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -34,10 +39,10 @@ public class UsrArticleController {
     private BoardService boardService;
 
     @Autowired
-    private CommentService commentService;
+    private ReactionPointService reactionPointService;
 
     @Autowired
-    private ReactionPointService reactionPointService;
+    private ReplyService replyService;
 
     UsrArticleController(BeforeActionInterceptor beforeActionInterceptor) {
         this.beforeActionInterceptor = beforeActionInterceptor;
@@ -113,15 +118,33 @@ public class UsrArticleController {
     }
 
     @RequestMapping("/usr/article/detail")
-    public String showDetail(HttpServletRequest req, Model model, @RequestParam int id) {
+    public String showDetail(HttpServletRequest req, Model model, int id) {
         Rq rq = (Rq) req.getAttribute("rq");
 
         Article article = articleService.getForPrintArticle(rq.getLoginedMemberId(), id);
+
+        ResultData usersReactionRd = reactionPointService.usersReaction(rq.getLoginedMemberId(), "article", id);
+
+        if (usersReactionRd.isSuccess()) {
+            model.addAttribute("userCanMakeReaction", usersReactionRd.isSuccess());
+        }
+
+        List<Reply> replies = replyService.getForPrintReplies(rq.getLoginedMemberId(), "article", id);
+
+        int repliesCount = replies.size();
+
+        model.addAttribute("replies", replies);
+        model.addAttribute("repliesCount", repliesCount);
+
         model.addAttribute("article", article);
+        model.addAttribute("usersReaction", usersReactionRd.getData1());
+        model.addAttribute("isAlreadyAddGoodRp",
+                reactionPointService.isAlreadyAddGoodRp(rq.getLoginedMemberId(), id, "article"));
+        model.addAttribute("isAlreadyAddBadRp",
+                reactionPointService.isAlreadyAddBadRp(rq.getLoginedMemberId(), id, "article"));
 
         return "usr/article/detail";
     }
-
 
     @RequestMapping("/usr/article/doIncreaseHitCountRd")
     @ResponseBody
@@ -133,33 +156,8 @@ public class UsrArticleController {
             return increaseHitCountRd;
         }
 
-        return ResultData.newData(increaseHitCountRd, "hitCount", articleService.getArticleHitCount(id));
-    }
-
-    @RequestMapping("/usr/article/doIncreaseLikeCountRd")
-    @ResponseBody
-    public ResultData doIncreaseLikeCount(HttpServletRequest req,int id) {
-        Rq rq = (Rq) req.getAttribute("rq");
-        ResultData increaseLikeCountRd = reactionPointService.doIncreaseLikeCount(id);
-
-        if (increaseLikeCountRd.isFail()) {
-            return increaseLikeCountRd;
-        }
-
-        return ResultData.newData(increaseLikeCountRd, "likeCount", reactionPointService.doIncreaseLikeCount(id));
-    }
-
-    @RequestMapping("/usr/article/doIncreaseDisLikeCountRd")
-    @ResponseBody
-    public ResultData doIncreaseDisLikeCount(HttpServletRequest req,int id) {
-        Rq rq = (Rq) req.getAttribute("rq");
-        ResultData increaseDisLikeCountRd = reactionPointService.doIncreaseDisLikeCount(id);
-
-        if (increaseDisLikeCountRd.isFail()) {
-            return increaseDisLikeCountRd;
-        }
-
-        return ResultData.newData(increaseDisLikeCountRd, "likeCount", reactionPointService.doIncreaseDisLikeCount(id));
+        return ResultData.from(increaseHitCountRd.getResultCode(), increaseHitCountRd.getMsg(), "hitCount",
+                articleService.getArticleHitCount(id), "articleId", id);
     }
 
     @RequestMapping("/usr/article/write")
@@ -211,9 +209,7 @@ public class UsrArticleController {
 
         int articlesCount = articleService.getArticleCount(boardId, searchKeywordTypeCode, searchKeyword);
 
-        // 한 페이지에 글 10개씩
-        // 글 20 -> 2page
-        // 글 25 -> 3page
+
         int itemsInAPage = 10;
 
         int pagesCount = (int) Math.ceil(articlesCount / (double) itemsInAPage);
@@ -233,22 +229,5 @@ public class UsrArticleController {
         return "usr/article/list";
     }
 
-    @RequestMapping("/usr/article/doComment")
-    @ResponseBody
-    public String doComment(HttpServletRequest req, String commentBody, int articleId) {
 
-        Rq rq = (Rq) req.getAttribute("rq");
-
-        if (Ut.isEmptyOrNull(commentBody)) {
-            return Ut.jsHistoryBack("F-1", "내용 입력하세요");
-        }
-
-        ResultData doCommentRd = commentService.writeComment(rq.getLoginedMemberId(), commentBody, articleId);
-
-        int id = (int) doCommentRd.getData1();
-
-        Comment comment = commentService.getCommentById(id);
-
-        return Ut.jsReplace(doCommentRd.getResultCode(), doCommentRd.getMsg(), "../article/detail?id=" + id);
-    }
 }

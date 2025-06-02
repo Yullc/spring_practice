@@ -3,35 +3,48 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.demo.repository.ReactionPointRepository">
-    <select id="getLikePoint" resultType="int" parameterType="map">
-        SELECT IFNULL(SUM(likePoint), 0) AS likePoint
-        FROM reactionPoint
-        WHERE relTypeCode = #{relTypeCode}
-          AND relId = #{relId}
-          AND likePoint > 0
+<mapper
+        namespace="com.example.demo.repository.ReactionPointRepository">
+
+    <insert id="addGoodReactionPoint">
+        INSERT INTO reactionPoint
+        SET
+            regDate = NOW(),
+		updateDate = NOW(),
+		memberId = #{memberId},
+            relTypeCode =
+            #{relTypeCode},
+            relId = #{relId},
+            `point` = 1;
+    </insert>
+
+    <insert id="addBadReactionPoint">
+        INSERT INTO reactionPoint
+        SET
+            regDate = NOW(),
+		updateDate = NOW(),
+		memberId = #{memberId},
+            relTypeCode =
+            #{relTypeCode},
+            relId = #{relId},
+            `point` = -1;
+    </insert>
+
+    <select id="getSumReactionPoint">
+        SELECT IFNULL(SUM(RP.point),0)
+        FROM reactionPoint AS
+                 RP
+        WHERE RP.relTypeCode = #{relTypeCode}
+          AND RP.relId = #{relId}
+          AND
+            RP.memberId = #{memberId};
     </select>
 
-    <select id="getDisLikePoint" resultType="int" parameterType="map">
-        SELECT IFNULL(SUM(dislikePoint), 0) AS dislikePoint
-        FROM reactionPoint
-        WHERE relTypeCode = #{relTypeCode}
+    <delete id="deleteReactionPoint">
+        DELETE FROM reactionPoint
+        WHERE memberId = #{memberId}
+          AND relTypeCode = #{relTypeCode}
           AND relId = #{relId}
-          AND dislikePoint > 0
-    </select>
-
-    <update id="increaseLikeCount" parameterType="int">
-        UPDATE reactionPoint
-        SET
-            likePoint = likePoint + 1
-        WHERE id = #{id}
-    </update>
-
-    <update id="increaseDisLikeCount" parameterType="int">
-        UPDATE reactionPoint
-        SET
-            dislikePoint = dislikePoint + 1
-        WHERE id = #{id}
-    </update>
+    </delete>
 
 </mapper>

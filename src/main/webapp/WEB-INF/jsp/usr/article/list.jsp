@@ -44,9 +44,9 @@
 					<th style="text-align: center;">Title</th>
 					<th style="text-align: center;">Writer</th>
 					<th style="text-align: center;">VIEWS</th>
-					<th style="text-align: center;">sumRP</th>
-					<th style="text-align: center;">goodRP</th>
-					<th style="text-align: center;">badRP</th>
+
+					<th style="text-align: center;">LIKE</th>
+					<th style="text-align: center;">DISLIKE</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -54,14 +54,19 @@
 					<tr class="hover:bg-base-300">
 						<td style="text-align: center;">${article.id}</td>
 						<td style="text-align: center;">${article.regDate.substring(0,10)}</td>
+
 						<td style="text-align: center;">
-							<a class="hover:underline" href="detail?id=${article.id }">${article.title }</a>
+							<a class="hover:underline" href="detail?id=${article.id}">${article.title}
+								<c:if test="${article.extra__repliesCount > 0 }">
+									<span style="color: red;">[${article.extra__repliesCount }]</span>
+								</c:if>
+							</a>
 						</td>
 						<td style="text-align: center;">${article.extra__writer }</td>
 						<td style="text-align: center;">${article.hitCount }</td>
-						<td style="text-align: center;">${article.extra__sumReactionPoint }</td>
-						<td style="text-align: center;">${article.extra__goodReactionPoint }</td>
-						<td style="text-align: center;">${article.extra__badReactionPoint }</td>
+
+						<td style="text-align: center;">${article.goodReactionPoint }</td>
+						<td style="text-align: center;">${article.badReactionPoint }</td>
 					</tr>
 				</c:forEach>
 

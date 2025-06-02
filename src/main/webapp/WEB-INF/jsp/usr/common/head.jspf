@@ -27,59 +27,56 @@
 		<div class="flex h-20 mx-auto items-center text-3xl">
 			<a href="/">LOGO</a>
 			<div class="flex-grow"></div>
-			<ul class="flex">
-				<li>
-					<a class="hover:underline" href="/">HOME</a>
-				</li>
-				<li>
-					<div class="dropdown dropdown-hover">
-						<div tabindex="0" role="button">
-							<a href="../article/list?boardId=1">LIST</a>
-						</div>
-						<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-							<li>
-								<a href="../article/list?boardId=1">NOTICE</a>
-							</li>
-							<li>
-								<a href="../article/list?boardId=2">FREE</a>
-							</li>
-							<li>
-								<a href="../article/list?boardId=3">QnA</a>
-							</li>
-						</ul>
-					</div>
-				</li>
-				<!-- 				<li> -->
-				<!-- 					<a class="hover:underline" href="../article/list?boardId=1">LIST</a> -->
-				<!-- 					<ul> -->
-				<!-- 						<li> -->
-				<!-- 							<a class="hover:underline" href="../article/list?boardId=1">NOTICE</a> -->
-				<!-- 						</li> -->
-				<!-- 						<li> -->
-				<!-- 							<a class="hover:underline" href="../article/list?boardId=2">FREE</a> -->
-				<!-- 						</li> -->
-				<!-- 						<li> -->
-				<!-- 							<a class="hover:underline" href="../article/list?boardId=3">QnA</a> -->
-				<!-- 						</li> -->
-				<!-- 					</ul> -->
-				<!-- 				</li> -->
-				<c:if test="${!rq.isLogined() }">
-					<li>
-						<a class="hover:underline" href="../member/login">LOGIN</a>
-					</li>
-					<li>
-						<a class="hover:underline" href="../member/join">JOIN</a>
-					</li>
-				</c:if>
-				<c:if test="${rq.isLogined() }">
-					<li>
-						<a class="hover:underline" href="../article/write">WRITE</a>
-					</li>
-					<li>
-						<a onclick="if(confirm('로그아웃 하시겠습니까?') == false) return false;" class="hover:underline" href="../member/doLogout">LOGOUT</a>
-					</li>
-				</c:if>
-			</ul>
+			<ul class="flex space-x-6 text-base font-medium">
+  <li>
+    <a class="hover:underline" href="/">Home</a>
+  </li>
+
+  <li>
+    <div class="dropdown dropdown-hover">
+      <div tabindex="0" role="button">
+        <a href="../article/list?boardId=1">Board</a>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow space-y-1">
+        <li>
+          <a href="../article/list?boardId=1">Notice</a>
+        </li>
+        <li>
+          <a href="../article/list?boardId=2">Free</a>
+        </li>
+        <li>
+          <a href="../article/list?boardId=3">QnA</a>
+        </li>
+      </ul>
+    </div>
+  </li>
+
+  <c:if test="${!rq.isLogined()}">
+    <li>
+      <a class="hover:underline" href="../member/login">Login</a>
+    </li>
+    <li>
+      <a class="hover:underline" href="../member/join">Join</a>
+    </li>
+  </c:if>
+
+  <c:if test="${rq.isLogined()}">
+    <li>
+      <a class="hover:underline" href="../article/write">Write</a>
+    </li>
+    <li>
+      <a class="hover:underline" href="../member/myPage">My Page</a>
+    </li>
+    <li>
+      <a onclick="if(confirm('로그아웃 하시겠습니까?') == false) return false;" class="hover:underline" href="../member/doLogout">Logout</a>
+    </li>
+  </c:if>
+
+  <li>
+    <a class="hover:underline" href="../article/qna">질문하기</a>
+  </li>
+</ul>
+
 		</div>
 	</header>
 

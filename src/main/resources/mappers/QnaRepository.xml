@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.QnaRepository">
+
+    <select id="getForPrintQnaArticles" parameterType="string" resultType="Article">
+        SELECT *
+        FROM qna
+        WHERE title LIKE CONCAT('%', #{searchKeyword}, '%')
+    </select>
+
+
+
+</mapper>
